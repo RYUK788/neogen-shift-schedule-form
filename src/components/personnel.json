@@ -1,0 +1,14 @@
+{
+  "supervisors": [
+    { "id": "john-doe", "name": "John Doe" },
+    { "id": "jane-smith", "name": "Jane Smith" },
+    { "id": "sam-wilson", "name": "Sam Wilson" },
+    { "id": "maria-garcia", "name": "Maria Garcia" }
+  ],
+  "shiftLeads": [
+    { "id": "alex-ray", "name": "Alex Ray" },
+    { "id": "brian-chen", "name": "Brian Chen" },
+    { "id": "casey-jones", "name": "Casey Jones" },
+    { "id": "diana-prince", "name": "Diana Prince" }
+  ]
+}
