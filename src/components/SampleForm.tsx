@@ -12,10 +12,10 @@ import {
   Col,
   notification,
 } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons'; // <-- Import the icon
+import { ReloadOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { fetchData } from '../../api';
-import personnelData from './personnel.json';
+import personnelData from './personnel.json'; 
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -41,13 +41,13 @@ function sqlValue(val: string | null | undefined): string {
 function buildInsertQuery(values: any): string {
   return `
     INSERT INTO shift_schedules (
-      schedule_date, supervisor, shift_lead, notes,
+      schedule_date, /* supervisor, */ shift_lead, notes,
       shift1_start, shift1_end,
       shift2_start, shift2_end,
       shift3_start, shift3_end
     ) VALUES (
       ${sqlValue(values.date)},
-      ${sqlValue(values.supervisor)},
+      /* ${sqlValue(values.supervisor)}, */
       ${sqlValue(values.shiftLead)},
       ${sqlValue(values.notes)},
       ${sqlValue(values.shift1.start)},
@@ -66,13 +66,38 @@ interface SampleFormProps {
 
 const SampleForm: React.FC<SampleFormProps> = props => {
   const [form] = Form.useForm();
-  const [supervisors, setSupervisors] = useState<Personnel[]>([]);
+  // const [supervisors, setSupervisors] = useState<Personnel[]>([]);
   const [shiftLeads, setShiftLeads] = useState<Personnel[]>([]);
+  const [loadingLeads, setLoadingLeads] = useState<boolean>(false); 
 
   useEffect(() => {
-    setSupervisors(personnelData.supervisors);
-    setShiftLeads(personnelData.shiftLeads);
-  }, []);
+    // setSupervisors(personnelData.supervisors);
+
+    const loadShiftLeads = async () => {
+      setLoadingLeads(true);
+      try {
+        const query = "SELECT username,first_name FROM ab_user";
+        const results: { username: string, first_name: string}[] = await fetchData(query);
+        
+        const formattedLeads = results.map(user => ({
+            id: user.username, 
+            name: user.first_name,
+        }));
+        setShiftLeads(formattedLeads);
+      } catch (error) {
+        console.error("Failed to fetch shift leads:", error);
+        notification.error({
+            message: 'Failed to Load Shift Leads',
+            description: 'Could not retrieve the user list from the server.',
+            placement: 'bottomRight',
+        });
+      } finally {
+        setLoadingLeads(false);
+      }
+    };
+
+    loadShiftLeads();
+  }, []); 
 
   const [initialFormValues] = useState({
     date: dayjs(),
@@ -86,7 +111,7 @@ const SampleForm: React.FC<SampleFormProps> = props => {
     try {
       const formattedValues = {
         date: values.date ? values.date.format('YYYY-MM-DD') : null,
-        supervisor: values.supervisor,
+        // supervisor: values.supervisor,
         shiftLead: values.shiftLead,
         notes: values.notes,
         shift1: {
@@ -119,7 +144,6 @@ const SampleForm: React.FC<SampleFormProps> = props => {
     }
   };
   
-  // The "New" button clears the form and shows a notification
   const newForm = () => {
     form.resetFields();
     openNotification('info', 'Form has been reset');
@@ -159,36 +183,40 @@ const SampleForm: React.FC<SampleFormProps> = props => {
         >
           <Row gutter={24}>
             <Col xs={24} sm={12}>
-              <Form.Item
+                <Form.Item
                 name="date"
                 label="Date"
                 rules={[{ required: true, message: 'Please select a date.' }]}
-              >
+                >
                 <DatePicker style={{ width: '100%' }} disabledDate={disabledDate} />
-              </Form.Item>
+                </Form.Item>
             </Col>
+
+            {/*
             <Col xs={24} sm={12}>
-              <Form.Item
+                <Form.Item
                 name="supervisor"
                 label="Supervisor"
                 rules={[{ required: true, message: 'Please select a supervisor.' }]}
-              >
+                >
                 <Select placeholder="Select a supervisor">
-                  {supervisors.map(s => (
+                    {supervisors.map(s => (
                     <Option key={s.id} value={s.name}>
-                      {s.name}
+                        {s.name}
                     </Option>
-                  ))}
+                    ))}
                 </Select>
-              </Form.Item>
+                </Form.Item>
             </Col>
+            */}
+
             <Col xs={24} sm={12}>
               <Form.Item
                 name="shiftLead"
                 label="Shift Lead"
                 rules={[{ required: true, message: "Please select a shift lead." }]}
               >
-                <Select placeholder="Select a shift lead">
+                <Select placeholder="Select a shift lead" loading={loadingLeads}>
                     {shiftLeads.map(lead => (
                         <Option key={lead.id} value={lead.name}>
                             {lead.name}
@@ -197,40 +225,40 @@ const SampleForm: React.FC<SampleFormProps> = props => {
                 </Select>
               </Form.Item>
             </Col>
+
+           
+
             <Col xs={24} sm={12}>
-              {/* This column is intentionally left blank for alignment */}
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item
+                <Form.Item
                 name="shift1"
                 label="Shift 1: Start & End Time"
                 rules={[{ required: true, message: 'Please select time for Shift 1.' }]}
-              >
+                >
                 <TimePicker.RangePicker style={{ width: '100%' }} format="h:mm A" />
-              </Form.Item>
+                </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item
+                <Form.Item
                 name="shift2"
                 label="Shift 2: Start & End Time"
                 rules={[{ required: true, message: 'Please select time for Shift 2.' }]}
-              >
+                >
                 <TimePicker.RangePicker style={{ width: '100%' }} format="h:mm A" />
-              </Form.Item>
+                </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item
+                <Form.Item
                 name="shift3"
                 label="Shift 3: Start & End Time"
                 rules={[{ required: true, message: 'Please select time for Shift 3.' }]}
-              >
+                >
                 <TimePicker.RangePicker style={{ width: '100%' }} format="h:mm A" />
-              </Form.Item>
+                </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item name="notes" label="Notes">
+                <Form.Item name="notes" label="Notes">
                 <TextArea rows={3} placeholder="Add any relevant notes here..." />
-              </Form.Item>
+                </Form.Item>
             </Col>
           </Row>
           <div
@@ -249,7 +277,6 @@ const SampleForm: React.FC<SampleFormProps> = props => {
               New
             </AntButton>
             <div>
-              {/* Reset button with icon added here */}
               <AntButton
                 type="default"
                 size="large"
