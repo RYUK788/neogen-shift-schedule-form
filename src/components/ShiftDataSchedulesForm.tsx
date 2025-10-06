@@ -1,4 +1,4 @@
-// Filename: SampleForm.tsx
+/*eslint-disable*/
 import React, { useState, useEffect } from 'react';
 import {
   Form,
@@ -15,7 +15,6 @@ import {
 import { ReloadOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { fetchData } from '../../api';
-import personnelData from './personnel.json'; 
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -40,14 +39,13 @@ function sqlValue(val: string | null | undefined): string {
 
 function buildInsertQuery(values: any): string {
   return `
-    INSERT INTO shift_schedules (
-      schedule_date, /* supervisor, */ shift_lead, notes,
+    INSERT INTO shift_schedules_data_table (
+      schedule_date, shift_lead, notes,
       shift1_start, shift1_end,
       shift2_start, shift2_end,
       shift3_start, shift3_end
     ) VALUES (
       ${sqlValue(values.date)},
-      /* ${sqlValue(values.supervisor)}, */
       ${sqlValue(values.shiftLead)},
       ${sqlValue(values.notes)},
       ${sqlValue(values.shift1.start)},
@@ -60,19 +58,16 @@ function buildInsertQuery(values: any): string {
   `;
 }
 
-interface SampleFormProps {
+interface ShiftDataSchedulesFormProps {
   closeForm?: () => void;
 }
 
-const SampleForm: React.FC<SampleFormProps> = props => {
+const ShiftDataSchedulesForm: React.FC<ShiftDataSchedulesFormProps> = props => {
   const [form] = Form.useForm();
-  // const [supervisors, setSupervisors] = useState<Personnel[]>([]);
   const [shiftLeads, setShiftLeads] = useState<Personnel[]>([]);
   const [loadingLeads, setLoadingLeads] = useState<boolean>(false); 
 
   useEffect(() => {
-    // setSupervisors(personnelData.supervisors);
-
     const loadShiftLeads = async () => {
       setLoadingLeads(true);
       try {
@@ -111,7 +106,6 @@ const SampleForm: React.FC<SampleFormProps> = props => {
     try {
       const formattedValues = {
         date: values.date ? values.date.format('YYYY-MM-DD') : null,
-        // supervisor: values.supervisor,
         shiftLead: values.shiftLead,
         notes: values.notes,
         shift1: {
@@ -192,24 +186,6 @@ const SampleForm: React.FC<SampleFormProps> = props => {
                 </Form.Item>
             </Col>
 
-            {/*
-            <Col xs={24} sm={12}>
-                <Form.Item
-                name="supervisor"
-                label="Supervisor"
-                rules={[{ required: true, message: 'Please select a supervisor.' }]}
-                >
-                <Select placeholder="Select a supervisor">
-                    {supervisors.map(s => (
-                    <Option key={s.id} value={s.name}>
-                        {s.name}
-                    </Option>
-                    ))}
-                </Select>
-                </Form.Item>
-            </Col>
-            */}
-
             <Col xs={24} sm={12}>
               <Form.Item
                 name="shiftLead"
@@ -225,8 +201,6 @@ const SampleForm: React.FC<SampleFormProps> = props => {
                 </Select>
               </Form.Item>
             </Col>
-
-           
 
             <Col xs={24} sm={12}>
                 <Form.Item
@@ -316,4 +290,4 @@ const SampleForm: React.FC<SampleFormProps> = props => {
   );
 };
 
-export default SampleForm;
+export default ShiftDataSchedulesForm;

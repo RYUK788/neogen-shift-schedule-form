@@ -1,12 +1,13 @@
 // import './App.css'
-import SampleForm from './components/SampleForm'
+import ShiftDataSchedulesForm from './components/ShiftDataSchedulesForm'
+import SampleForm from './components/ShiftDataSchedulesForm'
 
 function App() {
   
 
   return (
     <>
-      <SampleForm />
+      <ShiftDataSchedulesForm />
     </>
   )
 }
